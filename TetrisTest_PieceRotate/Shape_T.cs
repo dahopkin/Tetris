@@ -8,21 +8,47 @@ namespace Tetris
 {
     class Shape_T : Shape
     {
-        public Shape_T(Point location) : base(location, Color.Purple){
-            ConstructShape();
+        public Shape_T(Point location) : this(location, 0){}
+
+        public Shape_T(Point location, int rotationIndex)
+            : base(location, Color.Purple)
+        {
+            PivotBlock = block3;
+            this.rotationIndex = rotationIndex;
+            blocksToAssign = new Block[] { block2, block1, block4 };
+            blocksToGoFrom = new Block[] { PivotBlock, PivotBlock, PivotBlock };
+            connections = new NewBlockLocations[] { 
+                NewBlockLocations.Left,
+                NewBlockLocations.Top,
+                NewBlockLocations.Right
+            };
+            ConstructShape(rotationIndex);
         }
-        private void ConstructShape()
+
+        protected override void ConstructShape(int shapeIndex)
         {
 
-            Block block1 = new Block(Location, color);
-            Block block2 = new Block(block1.NewBlockBottomLeft, color);
-            Block block3 = new Block(block2.NewBlockRight, color);
-            Block block4 = new Block(block3.NewBlockRight, color);
-            pivotBlock = block3;
-            ShapeBlocks.Add(block1);
-            ShapeBlocks.Add(block2);
-            ShapeBlocks.Add(block3);
-            ShapeBlocks.Add(block4);
+            for (int i = 0; i < blocksToAssign.Length; i++)
+            {
+                blocksToAssign[i].Location =
+                    connections[i].RotatedCCWPoint(connections[i],
+                    blocksToGoFrom[i], shapeIndex);
+            }
+        }
+
+        public override Shape CopyShape()
+        {
+            return CopyShape(PivotBlock.Location, this.rotationIndex);
+        }
+
+        public override Shape CopyShape(Point location)
+        {
+            return CopyShape(location, 0);
+        }
+
+        public override Shape CopyShape(Point location, int rotationIndex)
+        {
+            return new Shape_T(location, rotationIndex);
         }
     }
 }

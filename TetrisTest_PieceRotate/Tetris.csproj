@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Block.cs" />
     <Compile Include="BlockType.cs" />
+    <Compile Include="NewBlockLocations.cs" />
+    <Compile Include="NewBlockLocationsExtensions.cs" />
     <Compile Include="Shape_I.cs" />
     <Compile Include="ShapeFactory.cs" />
     <Compile Include="Shape_T.cs" />
@@ -68,6 +70,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shape.cs" />
     <Compile Include="Shape_Z.cs" />
+    <Compile Include="Stats.cs" />
+    <Compile Include="TimedEffect.cs" />
+    <Compile Include="TimeUnit.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

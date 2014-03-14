@@ -16,9 +16,35 @@ namespace Tetris
             PileBlocks = new List<Block>();
         }
 
+        public Block this[Point point] {
+            get {
+                for (int i = 0; i < PileBlocks.Count(); i++)
+                    if (PileBlocks[i].Location == point) return PileBlocks[i];
+                return null;
+            }
+        }
+
         public void AddShapeToPile(Shape shapeToAdd) {
             foreach (Block block in shapeToAdd.ShapeBlocks)
                 PileBlocks.Add(block);
+            //shapeToAdd = null;
+        }
+
+        public void RemoveBlocksFromPile(List<Block> blocksToRemove)
+        {
+            foreach (Block block in blocksToRemove)
+                RemoveBlockFromPile(block);
+        }
+
+        public void RemoveBlockFromPile(Block blockToRemove)
+        {
+            if (PileBlocks.Contains(blockToRemove))
+                PileBlocks.Remove(blockToRemove);
+        }
+
+        public void Draw(Graphics g) {
+            foreach (Block block in PileBlocks)
+                block.Draw(g);
         }
     }
 }
