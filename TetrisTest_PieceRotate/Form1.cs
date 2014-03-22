@@ -11,10 +11,12 @@ namespace Tetris
 {
     public partial class Form1 : Form
     {
-        Grid grid;
+        Game game;
         Random random = new Random();
         bool gameOver;
         List<Keys> keysPressed = new List<Keys>();
+        BlockType blockType;
+        int switchTypeIndex = 0;
         public Form1()
         {
             InitializeComponent();
@@ -22,11 +24,18 @@ namespace Tetris
         }
 
         private void InitializeGrid(){
-            grid = new Grid(new Point(20, 20), random);
-            grid.GameOver += new EventHandler(grid_GameOver);
+            game = new Game(new Point(20, 20), random, BlockType.Solid);
+            game.GameOver += new EventHandler(grid_GameOver);
             tmrGame.Enabled = true;
             tmrAnimation.Enabled = true;
             gameOver = false;
+        }
+
+        void SwitchType() {
+            game.BlockType = (BlockType)switchTypeIndex;
+            switchTypeIndex = (switchTypeIndex + 1) % 3;
+            foreach (Block block in game.gridPile.PileBlocks)
+                block.DecideBlockType(game.BlockType);
         }
 
         void grid_GameOver(object sender, EventArgs e)
@@ -44,18 +53,14 @@ namespace Tetris
 
         private void Form1_MouseClick(object sender, MouseEventArgs e)
         {
-            /*Refresh();
-            shape = new Shape_O(e.Location);
-            using (Graphics g = this.CreateGraphics()) {
-                shape.Draw(g);
-            }*/
+            
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
 
-            grid.Draw(g);
+            game.Draw(g);
 
             if (gameOver)
             {
@@ -69,10 +74,10 @@ namespace Tetris
 
             Font playAgainFont = new Font("Arial", 9);
             Font gameOverTopFont = new Font("Arial", 24, FontStyle.Bold);
-            Point gameOverPoint = new Point((grid.Boundaries.Width / 10), (grid.Boundaries.Height / 2));
+            Point gameOverPoint = new Point((game.Boundaries.Width / 10), (game.Boundaries.Height / 2));
             Point playAgainPoint = new Point(gameOverPoint.X, gameOverPoint.Y + 40);
             SolidBrush fadeBlack = new SolidBrush(Color.FromArgb(127, Color.Black));
-            g.FillRectangle(fadeBlack, grid.Boundaries);
+            g.FillRectangle(fadeBlack, game.Boundaries);
             g.DrawString("GAME OVER!", gameOverTopFont, Brushes.White, gameOverPoint);
             g.DrawString(playAgain, playAgainFont, Brushes.White, playAgainPoint);
         }
@@ -84,28 +89,26 @@ namespace Tetris
 
         private void tmrGame_Tick(object sender, EventArgs e)
         {
-            grid.Go();
+            game.Go();
 
             foreach (Keys key in keysPressed)
             {
                 if (key == Keys.Left)
                 {
-                    grid.MoveCurrentShape(Direction.Left);
+                    game.MoveCurrentShape(Direction.Left);
                     return;
                 } // end if
 
                 else if (key == Keys.Right)
                 {
-                    grid.MoveCurrentShape(Direction.Right);
+                    game.MoveCurrentShape(Direction.Right);
                     return;
                 } // end else if
                 else if (key == Keys.Down)
                 {
-                    grid.MoveCurrentShape(Direction.Down);
+                    game.MoveCurrentShape(Direction.Down);
                     return;
                 } // end else if
-                
-
             } // end foreach
 
         }
@@ -114,16 +117,19 @@ namespace Tetris
         {
 
             if (e.KeyCode == Keys.Up)
-                grid.RotateCurrentShape();
+                game.RotateCurrentShape();
+
+            //if (e.KeyCode == Keys.B)
+                //SwitchType();
 
             if (e.KeyCode == Keys.Q)
                 Application.Exit();
 
             if (e.KeyCode == Keys.Space)
-                grid.HardDrop();
+                game.HardDrop();
             
             if (e.KeyCode == Keys.H)
-                grid.HoldShape();
+                game.HoldShape();
             
             if (gameOver)
             {

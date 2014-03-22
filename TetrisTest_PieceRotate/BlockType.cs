@@ -5,14 +5,10 @@ using System.Text;
 
 namespace Tetris
 {
-    enum BlockType
+    public enum BlockType
     {
-        I,
-        J,
-        L, 
-        O, 
-        S, 
-        T, 
-        Z
+        Solid,
+        Hollow,
+        Fade
     }
 }

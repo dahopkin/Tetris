@@ -21,32 +21,87 @@ namespace Tetris
          * -Property returning a point representing the lower left.
          
          */
+
         // an int to represent the length.
         private const int blockLength = 24;
-        private Bitmap image;
-        private Bitmap[] images;
+        
+        public Color Color;
+        
+        public IBlockType iBlockType;
+
+        public BlockType BlockType;
+
+        
+        /// <summary>
+        /// Gets the length of a block.
+        /// </summary>
         public static int BlockLength { get { return blockLength; } }
-        // a size to represent the size. Will be 
-        // filled by blocklength for length and width.
-        private Size blockSize;
-        // Location of the block. Upper left corner.
+        
+        /// <summary>
+        /// Gets the size of the block.
+        /// </summary>
+        public Size BlockSize { get { return new Size(BlockLength, BlockLength); } }
+        
+        /// <summary>
+        /// Gets or sets the Location point of the block.
+        /// </summary>
         public Point Location { get; set; }
-        private bool isClearing;
-        public bool IsClearing {
-            get { return isClearing; } 
-            set{
-                isClearing = value;
-                flickerStartTime = DateTime.Now;
-            } 
-        }
-        public bool HasCleared { get; set; }
-        private int flickerIndex = 0;
-        private DateTime flickerStartTime;
-        // The rectangle
+
+        /// <summary>
+        /// Gets the rectangle representing the area of the block.
+        /// </summary>
         public Rectangle Area
         {
-            get { return new Rectangle(Location, blockSize); }
+            get { return new Rectangle(Location, BlockSize); }
         } // end property Area
+
+        /// <summary>
+        /// Instantiates an instance of the the Block class from a location point and a color.
+        /// </summary>
+        /// <param name="location">The location of the block.</param>
+        /// <param name="color">The color of the block.</param>
+        public Block(Point location, Color color) : this(location, color, BlockType.Solid){}
+
+        /// <summary>
+        /// Instantiates an instance of the the Block class from a location point, a color, and a BlockType enum.
+        /// </summary>
+        /// <param name="location">The location of the block.</param>
+        /// <param name="color">The color of the block.</param>
+        /// <param name="blockType"></param>
+        public Block(Point location, Color color, BlockType BlockType) {
+            this.Location = location;
+            this.Color = color;
+            this.BlockType = BlockType;
+            DecideBlockType(BlockType);
+        }
+
+        /// <summary>
+        /// Instantiates a static gray instance of the the Block object from a location point.
+        /// </summary>
+        /// <param name="location">The locaton of the block.</param>
+        public Block(Point location) : this(location, Color.Gray) { } // end constructor method Block
+
+        /// <summary>
+        /// This method allocates the correct block type to use based on the BlockType enum.
+        /// </summary>
+        /// <param name="blockType"></param>
+        public void DecideBlockType(BlockType blockType) {
+            switch (blockType) { 
+                case BlockType.Solid:
+                    iBlockType = new SolidBlock(this);
+                    break;
+                case BlockType.Hollow:
+                    iBlockType = new HollowBlock(this);
+                    break;
+                case BlockType.Fade:
+                    iBlockType = new FaderBlock(this);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        #region Point Properties
 
         /// <summary>
         /// The starting location to create a new block to the left of the current one.
@@ -58,7 +113,6 @@ namespace Tetris
         /// <summary>
         /// The starting location to create a new block to the right of the current one.
         /// </summary>
-
         public Point NewBlockRight
         {
             get { return new Point(Area.Right, Location.Y); }
@@ -67,7 +121,6 @@ namespace Tetris
         /// <summary>
         /// The starting location to create a new block on top of the current one.
         /// </summary>
-
         public Point NewBlockTop
         {
             get { return new Point(Location.X, (Location.Y - blockLength)); }
@@ -113,16 +166,25 @@ namespace Tetris
             get { return new Point((Location.X - blockLength), Area.Bottom); }
         }
 
+        /// <summary>
+        /// The location of the top right of the block.
+        /// </summary>
         public Point TopRight
         {
             get { return new Point((Location.X + blockLength), Area.Top); }
         }
 
+        /// <summary>
+        /// The location of the bottom right of the block.
+        /// </summary>
         public Point BottomRight
         {
             get { return new Point((Location.X + blockLength), Area.Bottom); }
         }
 
+        /// <summary>
+        /// The location of the bottom left of the block.
+        /// </summary>
         public Point BottomLeft
         {
             get { return new Point(Location.X, Area.Bottom); }
@@ -138,9 +200,10 @@ namespace Tetris
                 return new Point((Area.Left + Area.Width / 2), (Area.Top + Area.Height / 2));
             } // end get 
         } // end property Middle
-
-        public Color color;
        
+        /// <summary>
+        /// Gets every point on the edge of the block.
+        /// </summary>
         public List<Point> AllCollisionPoints
         {
             get
@@ -180,104 +243,65 @@ namespace Tetris
                 };
             } // end get 
         } // end property CCWBlockPoints
-
-        public Block(Point location, Color color)
-        {
-            this.Location = location;
-            blockSize = new Size(blockLength, blockLength);
-            this.color = color;
-            this.isClearing = false;
-            this.HasCleared = false;
-            images = new Bitmap[2];
-            ConstructImages();
-            image = images[0];
-        } 
-        // This is for when you want to just use a phantom block to test things.
-        public Block(Point location): this(location, Color.Gray)
-        {
-            
-        } // end property Block
-
-        private void ConstructImage(Bitmap image, Color color)
-        {
-            Pen borderPen = new Pen(Color.Black);
-            Brush backColorBrush = new SolidBrush(color);
-            //Color fadedColor = Color.FromArgb(127, color);
-            //Pen borderPen = new Pen(color);
-            //Brush backColorBrush = new SolidBrush(fadedColor);
-            using (Graphics g = Graphics.FromImage(image))
-            {
-                g.FillRectangle(backColorBrush, 0,0,image.Width, image.Height);
-                g.DrawRectangle(borderPen, 0,0, image.Width, image.Height);
-            }
-        } // end property Block
-
-        private void ConstructImages()
-        {
-            images[0] = new Bitmap(blockSize.Width, blockSize.Height);
-            images[1] = new Bitmap(blockSize.Width, blockSize.Height);
-            ConstructImage(images[0], color);
-            ConstructImage(images[1], Color.White); 
-
-        } // end property Block
-
-       
-
-        //public void Draw(Graphics g){
-        //    Pen borderPen = new Pen(Color.Black);
-        //    Brush backColorBrush = new SolidBrush(color);
-        //    if (!IsClearing)
-        //    {
-        //        g.FillRectangle(backColorBrush, Area);
-        //        g.DrawRectangle(borderPen, Area);
-        //    }
-        //    else {
-        //        DateTime flickerCurrentTime = DateTime.Now;
-        //        TimeSpan duration = flickerCurrentTime - flickerStartTime;
-        //        if (duration.Milliseconds < 500)
-        //        {
-        //            flickerIndex = (flickerIndex + 1) % 2;
-        //            if (flickerIndex == 1)
-        //            {
-        //                g.FillRectangle(Brushes.White, Area);
-        //                g.DrawRectangle(borderPen, Area);
-        //            }
-        //            else
-        //            {
-        //                g.FillRectangle(backColorBrush, Area);
-        //                g.DrawRectangle(borderPen, Area);
-        //            }
-        //        }
-        //        else
-        //            HasCleared = true;
-        //    }
-        //} // end method Draw
-
+        #endregion
+        
+        /// <summary>
+        /// This method draws the block onto the screen.
+        /// </summary>
+        /// <param name="g">The graphics object to draw onto.</param>
         public void Draw(Graphics g)
         {
-            /*
-             image = invaderImages[animationCell];
-            g.DrawImageUnscaled(image, Location);
-             */
-            if (!IsClearing)
-            {
-                image = images[0];
-                g.DrawImageUnscaled(image, Location);
-            }
-            else
-            {
-                DateTime flickerCurrentTime = DateTime.Now;
-                TimeSpan duration = flickerCurrentTime - flickerStartTime;
-                if (duration.Milliseconds < 500)
-                {
-                        flickerIndex = (flickerIndex + 1) % 2;
-                        image = images[flickerIndex];
-                        g.DrawImageUnscaled(image, Location);
-                }
-                else
-                    HasCleared = true;
-            }
+            iBlockType.Draw(g);
         } // end method Draw
+
+        /// <summary>
+        /// This method starts the block's flashing animation.
+        /// </summary>
+        public void StartFlashing() {
+            iBlockType.StartFlashing();
+        } 
+
+        /// <summary>
+        /// This method checks to see if the block is done flashing.
+        /// </summary>
+        /// <returns>A boolean indicating if the block is done flashing.</returns>
+        public bool DoneFlashing()
+        {
+            return iBlockType.DoneFlashing();
+        }
+
+        /// <summary>
+        /// This method checks to see if the block is flashing.
+        /// </summary>
+        /// <returns>A boolean indicating whether or not the block is flashing.</returns>
+        public bool IsFlashing()
+        {
+            return iBlockType.IsFlashing();
+        }
+
+        /// <summary>
+        /// This method moves the block left, right, or down.
+        /// </summary>
+        /// <param name="directionToMove">The direction in which to move.</param>
+        /// <param name="distanceToMove">The distance to move.</param>
+        public void Move(Direction directionToMove, int distanceToMove) {
+            switch (directionToMove) { 
+                case Direction.Left:
+                    Location = new Point((Location.X - distanceToMove), Location.Y);
+                    break;
+                case Direction.Right:
+                    Location = new Point((Location.X + distanceToMove), Location.Y);
+                    break;
+                case Direction.Down:
+                    Location = new Point(Location.X, (Location.Y + distanceToMove));
+                    break;
+                case Direction.Up:
+                    Location = new Point(Location.X, (Location.Y - distanceToMove));
+                    break;
+                default:
+                    break;
+            } // end switch 
+        }
 
     }
 }

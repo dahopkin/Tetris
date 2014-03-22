@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace Tetris
 {
-    abstract class Shape
+    public class Shape
     {
         
         /*This shape class will be the basis for all shapes
@@ -31,7 +31,7 @@ namespace Tetris
         public Block PivotBlock;
         //public BlockType blockType;
         public Point Location { get; set; }
-        public Color color;
+        public Color Color;
         public Block block1;
         public Block block2;
         public Block block3;
@@ -39,39 +39,73 @@ namespace Tetris
         protected int rotationIndex = 0;
         // Turn the following 3 arrays into a class that takes
         // two blocks and a NewBlockLocation as parameters.
-        protected Block[] blocksToAssign;
-        protected Block[] blocksToGoFrom;
-        protected NewBlockLocations[] connections;
-        public Shape(Point location, Color color) { 
+        public Block[] blocksToAssign;
+        public Block[] blocksToGoFrom;
+        public NewBlockLocations[] connections;
+        public BlockType blockType;
+        public ShapeName shapeName;
+        protected ShapeConstructor shapeConstructor;
+
+        /// <summary>
+        /// Instantiates an instance of the Shape class from a location point, a color, and a BlockType enum.
+        /// </summary>
+        /// <param name="location">The location point where the shape is made.</param>
+        /// <param name="color">The color of the shape.</param>
+        /// <param name="blockType">The type of block.</param>
+        //public Shape(Point location, Color color, int rotationIndex, BlockType blockType, ShapeName shapeName)
+        public Shape(Point location, int rotationIndex, BlockType blockType, ShapeName shapeName)
+        {
             //this.boundaries = boundaries;
             this.Location = location;
-            this.color = color;
+            //this.color = color;
             this.ShapeBlocks = new List<Block>();
-            block1 = new Block(location, color);
-            block2 = new Block(location, color);
-            block3 = new Block(location, color);
-            block4 = new Block(location, color);
+            this.blockType = blockType;
+            this.shapeName = shapeName;
+            this.rotationIndex = rotationIndex;
+            /*block1 = new Block(location, Color.Blue, blockType);
+            block2 = new Block(location, Color.Blue, blockType);
+            block3 = new Block(location, Color.Blue, blockType);
+            block4 = new Block(location, Color.Blue, blockType);
+            ShapeBlocks.Add(block1);
+            ShapeBlocks.Add(block2);
+            ShapeBlocks.Add(block3);
+            ShapeBlocks.Add(block4);*/
+            shapeConstructor = new ShapeConstructor(this);
+            shapeConstructor.FormShape();
+            ConstructShape(rotationIndex);
+        }
+
+        public Shape(Point location, BlockType blockType, ShapeName shapeName) : this(location, 0, blockType, shapeName){}
+
+
+        /*public Shape(Point location, Color color, BlockType blockType)
+        {
+            //this.boundaries = boundaries;
+            this.Location = location;
+            this.Color = color;
+            this.ShapeBlocks = new List<Block>();
+            this.blockType = blockType;
+            block1 = new Block(location, color, blockType);
+            block2 = new Block(location, color, blockType);
+            block3 = new Block(location, color, blockType);
+            block4 = new Block(location, color, blockType);
             ShapeBlocks.Add(block1);
             ShapeBlocks.Add(block2);
             ShapeBlocks.Add(block3);
             ShapeBlocks.Add(block4);
-            //ConstructShape();
-        }
-
-       /*public Shape(Shape shape)
-        {
-
-           this.ShapeBlocks = new List<Block>(); 
-           foreach (Block block in shape.ShapeBlocks)
-                this.ShapeBlocks.Add(new Block(block.Location, block.color));
-            this.color = ShapeBlocks[0].color;
-            this.Location = shape.Location;
-            this.PivotBlock = shape.PivotBlock;
-            //ConstructShape();
         }*/
 
+        /// <summary>
+        /// Instantiates a solid block instance of the Shape class from a location point and a color.
+        /// </summary>
+        /// <param name="location">The location point where the shape is made.</param>
+        /// <param name="color">The color of the shape.</param>
+        //public Shape(Point location, Color color): this(location, color, BlockType.Solid) { }
 
-
+        /// <summary>
+        /// This method draws the Shape onto the screen.
+        /// </summary>
+        /// <param name="g">The graphics object to draw onto.</param>
         public void Draw(Graphics g) {
             foreach (Block block in ShapeBlocks)
                 block.Draw(g);
@@ -79,11 +113,28 @@ namespace Tetris
 
         //protected abstract void ConstructShape(int shapeIndex);
 
-        public abstract Shape CopyShape();
+        /// <summary>
+        /// This method copies the shape exactly 
+        /// </summary>
+        /// <returns>A copy of the shape.</returns>
+        //public abstract Shape CopyShape();
 
-        public abstract Shape CopyShape(Point location);
+        //public abstract Shape CopyShape(Point location);
 
-        public abstract Shape CopyShape(Point location, int rotationIndex);
+        //public abstract Shape CopyShape(Point location, int rotationIndex);
+
+        public Shape CopyShape(){
+            return CopyShape(PivotBlock.Location, this.rotationIndex);
+        }
+
+        public Shape CopyShape(Point location){
+            return CopyShape(location, 0);
+        }
+
+        public Shape CopyShape(Point location, int rotationIndex){
+            //return new Shape(location, rotationIndex, blockType);
+            return new Shape(location, rotationIndex, this.blockType, this.shapeName);
+        }
 
         public virtual void RotateShape() {
             rotationIndex = (rotationIndex + 1) % 4;
@@ -92,7 +143,6 @@ namespace Tetris
 
         protected virtual void ConstructShape(int shapeIndex)
         {
-
             for (int i = 0; i < blocksToAssign.Length; i++)
             {
                 blocksToAssign[i].Location =
@@ -101,6 +151,11 @@ namespace Tetris
             }
         }
 
+        /// <summary>
+        /// Moves the shape a certain distance in the direction specified.
+        /// </summary>
+        /// <param name="direction">The direction to move.</param>
+        /// <param name="distance">The distance to move.</param>
         public void Move(Direction direction, int distance) { 
             // the code to ensure WHETHER the shape can move
             // will have to be in the grid class.
@@ -115,143 +170,61 @@ namespace Tetris
                     MoveShapeRight(distance);
                     break;
                 case (Direction.Up):
+                    MoveShapeUp(distance);
+                    break;
+                default:
                     break;
             } // end switch
 
         }
 
+        /// <summary>
+        /// Moves the shape one block in the direction specified.
+        /// </summary>
+        /// <param name="direction">The direction to move.</param>
         public void Move(Direction direction)
         {
             Move(direction, Block.BlockLength);
         }
 
+        /// <summary>
+        /// This method moves the entire shape down.
+        /// </summary>
+        /// <param name="distance">The distance to move</param>
         public void MoveShapeDown(int distance){
             for (int i = 0; i < ShapeBlocks.Count; i++)
-                ShapeBlocks[i].Location = new Point(
-                    ShapeBlocks[i].Location.X, ShapeBlocks[i].Location.Y + distance);
+                ShapeBlocks[i].Move(Direction.Down, distance);
         }
 
+        /// <summary>
+        /// This method moves the entire shape left.
+        /// </summary>
+        /// <param name="distance">The distance to move</param>
         public void MoveShapeLeft(int distance)
         {
             for (int i = 0; i < ShapeBlocks.Count; i++)
-                ShapeBlocks[i].Location = new Point(
-                    ShapeBlocks[i].Location.X - distance, ShapeBlocks[i].Location.Y);
+                ShapeBlocks[i].Move(Direction.Left, distance);
         }
-        
+
+        /// <summary>
+        /// This method moves the entire shape right.
+        /// </summary>
+        /// <param name="distance">The distance to move</param>
         public void MoveShapeRight(int distance)
         {
             for (int i = 0; i < ShapeBlocks.Count; i++)
-                ShapeBlocks[i].Location = new Point(
-                    ShapeBlocks[i].Location.X + distance, ShapeBlocks[i].Location.Y);
+                ShapeBlocks[i].Move(Direction.Right, distance);
         }
-        // rotate returns false if it the shape can't be rotated.
-  /*      public virtual void RotateShape() {
-            List<Point> newBlockLocationsList = new List<Point>();
-            Point pivotPoint = PivotBlock.Location;
-            foreach (Block block in ShapeBlocks)
-                newBlockLocationsList.Add(block.Location);
-                       
-            for (int i = 0; i < newBlockLocationsList.Count; i++)
-                if (newBlockLocationsList[i] != pivotPoint)
-                    newBlockLocationsList[i] = RotatePoint90DegreesCounterClockWise(newBlockLocationsList[i], pivotPoint);
 
+        /// <summary>
+        /// This method moves the entire shape up.
+        /// </summary>
+        /// <param name="distance">The distance to move</param>
+        public void MoveShapeUp(int distance)
+        {
             for (int i = 0; i < ShapeBlocks.Count; i++)
-                ShapeBlocks[i].Location = newBlockLocationsList[i];
-
+                ShapeBlocks[i].Move(Direction.Up, distance);
         }
-
-        /*
-        public void RotateShape(Shape shape)
-        {
-            List<Point> newBlockLocationsList = new List<Point>();
-            Point pivotPoint = pivotBlock.Location;
-            foreach (Block block in shape.ShapeBlocks)
-                newBlockLocationsList.Add(block.Location);
-
-            for (int i = 0; i < newBlockLocationsList.Count; i++)
-                if (newBlockLocationsList[i] != pivotPoint)
-                    newBlockLocationsList[i] = RotatePoint90DegreesCounterClockWise(newBlockLocationsList[i], pivotPoint);
-
-            for (int i = 0; i < shape.ShapeBlocks.Count; i++)
-                shape.ShapeBlocks[i].Location = newBlockLocationsList[i];
-
-        }*/
-
-
-        private Point RotatePoint90DegreesCounterClockWise(Point rotatePoint, Point pivot) {
-            /*This rotation method is based off of a youtube
-             video detailing matrix rotation of a point.
-             Link:https://www.youtube.com/watch?v=Atlr5vvdchY 
-             * Steps:
-             * 1.) Subtract the X'es and Y's of the point to rotate
-             * from those of the pivot point this gets you a point
-             * representing the relative vector distance between the two points.
-             
-             * 2.) Multiply the X'es and Y's of relative vector distance by the 
-             * "X'es and Y's" of these integer pairs: (0, -1) and (1, 0). Add all
-             * results together for Xes and Ys separately. You'll get the vector
-             * transformed.
-             * 
-             * 3.) Add the  X'es and Y's of the vector transformed to those of the
-             * pivot point.
-             * 
-             * The rotate algorithm works, but doesn't uses loops for its matrix
-             * multiplication. I have to find out how to do that when one array
-             */
-
-            int[,] pivotPointMatrix = new int[2, 1] { { pivot.X }, { pivot.Y } };
-            int[,] rotatePointMatrix = new int[2, 1] { { rotatePoint.X }, { rotatePoint.Y } };
-            int[,] transformationMatrix = new int[2,2]{ {0,-1},{1,0}};
-            int[,] vectorRelativeToPivot = new int[2, 1];
-            int[,] vectorTransformed = new int[2, 1];
-            Point pointTransformed;
-            for (int i = 0; i < vectorRelativeToPivot.GetLength(0); i++)
-                for (int j = 0; j < vectorRelativeToPivot.GetLength(1); j++)
-                    vectorRelativeToPivot[i, j] = rotatePointMatrix[i, j] - pivotPointMatrix[i, j];          
-            
-            /*This commented block worked perfectly for the rotation, but I wanted something with loops.
-             * vectorTransformed[0, 0] = (transformationMatrix[0, 0] * vectorRelativeToPivot[0, 0])
-                + (transformationMatrix[0, 1] * vectorRelativeToPivot[1, 0]);
-            vectorTransformed[1, 0] = (transformationMatrix[1, 0] * vectorRelativeToPivot[0, 0])
-                + (transformationMatrix[1, 1] * vectorRelativeToPivot[1, 0]);*/
-
-            for (int transformRow = 0; transformRow < vectorTransformed.GetLength(0); transformRow++)
-                for (int transformColumn = 0; transformColumn < vectorTransformed.GetLength(1); transformColumn++)
-                    for (int k = 0; k < transformationMatrix.GetLength(1); k++)
-                        vectorTransformed[transformRow, transformColumn]
-                            += transformationMatrix[transformRow, k]
-                            * vectorRelativeToPivot[k, transformColumn];
-
-
-            pointTransformed = new Point(pivot.X + vectorTransformed[0, 0], pivot.Y + vectorTransformed[1, 0]);
-                        
-            return pointTransformed;
-
-        }
-
-        /*private bool WillPassBorder(Point pointToCheck) {
-            if ((pointToCheck.X < boundaries.Left) 
-                || (pointToCheck.X > boundaries.Right)
-                || (pointToCheck.Y > boundaries.Bottom)) return true;
-            return false;
-        }*/
-
-       /* private bool WillOverlapAnotherBlock(Point pointToCheck)
-        {
-             Get the points from all blocks in the shape.
-             * If you run the risk of
-            Block testBlock = new Block(pointToCheck);
-            List<Point> pointToCheckEdges = new List<Point>();
-            pointToCheckEdges.Add(testBlock.Location);
-            pointToCheckEdges.Add(testBlock.TopRight);
-            pointToCheckEdges.Add(testBlock.BottomLeft);
-            pointToCheckEdges.Add(testBlock.BottomRight);
-            if ((pointToCheck.X < boundaries.Left)
-                || (pointToCheck.X > boundaries.Right)
-                || (pointToCheck.Y > boundaries.Bottom)) return true;
-            return false;
-        }*/
-
 
     }
 }

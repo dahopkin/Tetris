@@ -6,12 +6,16 @@ using System.Drawing;
 
 namespace Tetris
 {
-    class Shape_T : Shape
+    class Shape_T //: Shape
     {
-        public Shape_T(Point location) : this(location, 0){}
+        /*public Shape_T(Point location) : this(location, 0) { }
 
-        public Shape_T(Point location, int rotationIndex)
-            : base(location, Color.Purple)
+        public Shape_T(Point location, BlockType blockType) : this(location, 0, blockType) { }
+
+        public Shape_T(Point location, int rotationIndex) : this(location, rotationIndex, BlockType.Solid) { }
+
+        public Shape_T(Point location, int rotationIndex, BlockType blockType)
+            : base(location, Color.Purple, blockType)
         {
             PivotBlock = block3;
             this.rotationIndex = rotationIndex;
@@ -48,7 +52,7 @@ namespace Tetris
 
         public override Shape CopyShape(Point location, int rotationIndex)
         {
-            return new Shape_T(location, rotationIndex);
-        }
+            return new Shape_T(location, rotationIndex, blockType);
+        }*/
     }
 }

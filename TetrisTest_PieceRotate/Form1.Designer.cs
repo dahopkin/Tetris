@@ -35,7 +35,7 @@
             // 
             // tmrGame
             // 
-            this.tmrGame.Interval = 50;
+            this.tmrGame.Interval = 60;
             this.tmrGame.Tick += new System.EventHandler(this.tmrGame_Tick);
             // 
             // tmrAnimation

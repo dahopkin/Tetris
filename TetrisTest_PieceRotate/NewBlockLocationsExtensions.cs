@@ -11,6 +11,12 @@ namespace Tetris
         // The idea for this length function comes from stack overflow as well.
         public static int Length() { return Enum.GetNames(typeof(NewBlockLocations)).Length; }
 
+        /// <summary>
+        /// This method returns a point you can use to create a new block, based on a NewBlockLocations enum.
+        /// </summary>
+        /// <param name="self">A reference to the enum. Will not be used by the user.</param>
+        /// <param name="block">The block to use as a reference.</param>
+        /// <returns>Returns a point for creating a new block.</returns>
         public static Point ReturnPoint(NewBlockLocations self, Block block)
         {
             Point pointToReturn = new Point(0,0);
@@ -43,6 +49,14 @@ namespace Tetris
             return pointToReturn;
         }
 
+        /// <summary>
+        /// This method returns a point rotated 90 degrees counter-clockwise from an original point.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="originalLocation">The NewBlockLocations variable representing the original location.</param>
+        /// <param name="block">The block to rotate around.</param>
+        /// <param name="rotationIndex">The rotation index to use as a guide.</param>
+        /// <returns>A rotated point.</returns>
         public static Point RotatedCCWPoint(this NewBlockLocations self, NewBlockLocations originalLocation,
             Block block, int rotationIndex)
         {
@@ -53,6 +67,14 @@ namespace Tetris
             return rotatedCCWPoint;
         }
 
+        /// <summary>
+        /// This method returns a point rotated 90 degrees clockwise from an original point.
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="originalLocation">The NewBlockLocations variable representing the original location.</param>
+        /// <param name="block">The block to rotate around.</param>
+        /// <param name="rotationIndex">The rotation index to use as a guide.</param>
+        /// <returns>A rotated point.</returns>
         public static Point RotatedCWPoint(this NewBlockLocations self, NewBlockLocations originalLocation,
             Block block, int rotationIndex)
         {

@@ -5,11 +5,5 @@ using System.Text;
 
 namespace Tetris
 {
-    public enum Direction
-    {
-        Up, 
-        Right,
-        Down,
-        Left
-    }
+    public interface IBlockType : IDrawStyle, IConstructStyle {}
 }

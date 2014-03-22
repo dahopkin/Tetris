@@ -5,8 +5,14 @@ using System.Text;
 
 namespace Tetris
 {
-    class Stats
+    public enum ShapeName
     {
-
+        I,
+        J,
+        L, 
+        O, 
+        S, 
+        T, 
+        Z
     }
 }
