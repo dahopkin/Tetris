@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+ * The DrawFromMultiImageArray class renders a block that has an array of more
+ * than two images, animating every image except the last on a repeat loop. The last
+ * image is the white block which will show when flashing. The class also controls the flashing
+ * of the block when it must be removed from the game.
+ * 
+ * It needs an image array and a block for its creation. 
+ * 
+ * The class has public methods for:
+ * -Drawing the block onto the screen.
+ * -Making the block start flashing, and checking to see if it's still flashing
+ * or has stopped flashing.
+ * 
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +46,7 @@ namespace Tetris
             this.image = images[animationCounterIndex];
             BlockFlashing = new TimedEffect(500, TimeUnit.Milliseconds);
             this.flipAnimation = false;
-        }
+        } // end constructor method DrawFromMultiImageArray
 
         /// <summary>
         /// This method makes the block start flashing.
@@ -71,7 +88,7 @@ namespace Tetris
                     g.DrawImageUnscaled(image, block.Location);
                 }
             }
-        }
+        } // end method Draw
 
         /// <summary>
         /// This method keeps the animation going.
@@ -82,8 +99,6 @@ namespace Tetris
 
             if (animationCounterIndex == 0) flipAnimation = false;
             else if (animationCounterIndex == animationMaxIndex) flipAnimation = true;
-
-
-        }
+        } // end method IterateAnimation
     }
 }

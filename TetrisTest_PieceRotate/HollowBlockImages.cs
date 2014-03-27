@@ -1,4 +1,17 @@
-﻿using System;
+﻿/*
+ * The HollowBlockImages class makes a block use an array of images that are semi-transparent
+ * for drawing onto the screen. This array of images will be passed on to whatver drawing method
+ * renders them onto the screen.
+ * 
+ * It needs a block to manipulate for for its creation.
+ * 
+ * The class has a public method for building the block's images, which is really 
+ * just using its private methods for building the images behind the scenes.
+ * 
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +32,7 @@ namespace Tetris
         {
             this.Images = new Bitmap[2];
             this.block = block;
-        }
+        } // end constructor method HollowBlockImages
 
         /// <summary>
         /// This method builds the Images array within the HollowBlockImages class.

@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*
+ * The Pile class represents a group of blocks on screen that are no longer moving.
+ * 
+ * The class has public methods for:
+ * -Adding shapes and removing blocks from the pile.
+ * -Drawing the pile onto the screen.
+ * 
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +18,6 @@ namespace Tetris
 {
     class Pile
     {
-        /*Pile, like Shape, is a combination of blocks. Unlike Shape, it will change
-         * over time as it absorbs new blocks into itself from shapes. */
         public List<Block> PileBlocks;
 
         /// <summary>
@@ -17,16 +25,21 @@ namespace Tetris
         /// </summary>
         public Pile() {
             PileBlocks = new List<Block>();
-        }
+        } // end constructor method Pile
 
-
+        /// <summary>
+        /// This indexer returns a block in the pile if it's located at a certain point,
+        /// or null if it's not.
+        /// </summary>
+        /// <param name="point">The point to check for a block's presence.</param>
+        /// <returns>A block located at a certain point, or null.</returns>
         public Block this[Point point] {
             get {
                 for (int i = 0; i < PileBlocks.Count(); i++)
                     if (PileBlocks[i].Location == point) return PileBlocks[i];
                 return null;
-            }
-        }
+            } // end get
+        } // end indexer
 
         /// <summary>
         /// This method adds a shape to the pile.
@@ -36,7 +49,7 @@ namespace Tetris
             foreach (Block block in shapeToAdd.ShapeBlocks)
                 PileBlocks.Add(block);
             //shapeToAdd = null;
-        }
+        } // end method AddShapeToPile
 
         /// <summary>
         /// This method removes a list of blocks from the pile.
@@ -46,7 +59,7 @@ namespace Tetris
         {
             foreach (Block block in blocksToRemove)
                 RemoveBlockFromPile(block);
-        }
+        } // end method RemoveBlocksFromPile
 
         /// <summary>
         /// This method removes a block from the pile.
@@ -56,7 +69,7 @@ namespace Tetris
         {
             if (PileBlocks.Contains(blockToRemove))
                 PileBlocks.Remove(blockToRemove);
-        }
+        } // end method RemoveBlockFromPile
 
         /// <summary>
         /// This method draws the pile of blocks onto the screen.
@@ -65,6 +78,6 @@ namespace Tetris
         public void Draw(Graphics g) {
             foreach (Block block in PileBlocks)
                 block.Draw(g);
-        }
+        } // end method Draw
     }
 }

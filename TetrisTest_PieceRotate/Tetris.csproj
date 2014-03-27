@@ -49,7 +49,7 @@
     <Compile Include="Block.cs" />
     <Compile Include="BlockType.cs" />
     <Compile Include="FadedBlockImages.cs" />
-    <Compile Include="FaderBlock.cs" />
+    <Compile Include="FadedBlock.cs" />
     <Compile Include="DrawFromMultiImageArray.cs" />
     <Compile Include="HollowBlock.cs" />
     <Compile Include="HollowBlockImages.cs" />

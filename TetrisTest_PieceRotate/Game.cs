@@ -1,4 +1,28 @@
-﻿using System;
+﻿/*
+ * The Game class regulates the tetris gaming session.
+ * It needs a location Point, a Random, and a BlockType for its creation. The class creates a 
+ * grid where the blocks will fall on the form. Stats will be rendered to the right of the grid. 
+ * This is all rendered in GDI.
+ * 
+ * The class has public methods for:
+ * -Moving, rotating, hard-dropping, and holding shapes.
+ * -Drawing all of the game's elements onto the screen.
+ * -Keeping the game active.
+ * 
+ * The class has private methods for: 
+ * -Collision detection. All collision detection methods 
+ * relating to movement try to predict where the shape will be
+ * if it moves and see if it's past a 
+ * boundary/overlapping another shape.
+ * -Clearing lines when they've formed.
+ * -Drawing individual objects onto the screen.
+ * -Going to the next shape.
+ * 
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +32,7 @@ namespace Tetris
 {
     class Game
     {
-        /*This grid class will be where the "Tetris" part of tetris happens. Shapes will 
-         * be generated at random and will be fused the pile when they reach it
-         * The grid's size will be 10x22
-         */
+        
         //Grid's size needs to be 10x20
         public int gridWidth = 10;
         public int gridHeight = 20;
@@ -65,7 +86,7 @@ namespace Tetris
             GenerateBackgroundBlockGrid();
             lockDelay = new TimedEffect(500, TimeUnit.Milliseconds);
             this.BlockType = BlockType;
-        }
+        } // end constructor method Game
 
         /// <summary>
         /// This method progresses all the game actions along. The current shape is moved 
@@ -83,7 +104,7 @@ namespace Tetris
             FlashLines();
             ClearLines();
             CheckToRaiseLevel();
-        }
+        } // end method Go
 
         private int BlocksOver(int numberOfBlocksOver) { return numberOfBlocksOver * Block.BlockLength; }
 
@@ -113,7 +134,7 @@ namespace Tetris
             DrawHeldShape(g);
             DrawCurrentShape(g);
             DrawStats(g);
-        }
+        } // end method Draw
 
         /// <summary>
         /// This method draws the Score, Lines Cleared, and Level onto the screen.
@@ -133,7 +154,7 @@ namespace Tetris
             Font scoreFont = new Font("Arial", 12, FontStyle.Bold);
             g.DrawString(scoreString, scoreFont, Brushes.Black, startPoint);
 
-        }
+        } // end method DrawStats
 
         /// <summary>
         /// This method draws the next shape on the form.
@@ -158,7 +179,7 @@ namespace Tetris
                 Shape displayShape = dropShapes[0].CopyShape(shapeDisplayPoint);
                 displayShape.Draw(g);
             }
-        }
+        } // end method DrawNextShape
 
         /// <summary>
         /// This method draws the shape being held on the form.
@@ -181,8 +202,8 @@ namespace Tetris
                 Point shapeDisplayPoint = GetShapeDisplayPoint(heldShape, background);
                 Shape displayShape = heldShape.CopyShape(shapeDisplayPoint);
                 displayShape.Draw(g);
-            }
-        }
+            } 
+        } // end method DrawHeldShape
 
         /// <summary>
         /// This method draws the current moving shape on the form.
@@ -196,9 +217,9 @@ namespace Tetris
                 {
                     if (block.Location.Y >= Boundaries.Top)
                         block.Draw(g);
-                }
-            }
-        }
+                } 
+            } 
+        } // end method DrawCurrentShape 
 
         /// <summary>
         /// This method uses a Shape and a Rectangle background to 
@@ -231,7 +252,7 @@ namespace Tetris
             else if (shapeToDisplay.shapeName == ShapeName.Z)
                 shapeDisplayPoint = new Point(background.Left + BlocksOver(2), background.Top + BlocksOver(1));
             return shapeDisplayPoint;
-        }
+        } // end method GetShapeDisplayPoint
 
         /// <summary>
         /// This method generates a grid of transparent blocks for a background.
@@ -254,7 +275,7 @@ namespace Tetris
                         , (startPoint.Y + i * Block.BlockLength))));
                 }
             }
-        }
+        } // end method GenerateBackgroundBlockGrid
 
         #endregion
 
@@ -290,7 +311,7 @@ namespace Tetris
                     && !WouldPassLeftOrRightBorder(currentShapeCopy))
                     currentShape = currentShapeCopy;
             }
-        }
+        } // end method MoveCurrentShape
 
         /// <summary>
         /// This method moves the shape down automatically. It keeps the game in motion.
@@ -303,7 +324,7 @@ namespace Tetris
                 MoveCurrentShape(Direction.Down);
                 framesSkipped = 0;
             }
-        }
+        } // end method AutoMoveDown
 
         /// <summary>
         /// This method drops the shape onto the pile.
@@ -316,7 +337,7 @@ namespace Tetris
                 while (ShapeCanMoveDown())
                     MoveCurrentShape(Direction.Down);
             }
-        }
+        } // end method HardDrop
 
         /// <summary>
         /// This method returns the shortest distance between a block in the falling shape and 
@@ -336,7 +357,7 @@ namespace Tetris
             if (minDistanceFromLeftBorder > Block.BlockLength) return Block.BlockLength;
             else return minDistanceFromLeftBorder;
 
-        }
+        } // end method ShortestDistanceFromLeft
 
         /// <summary>
         /// This method returns the shortest distance between a block in the falling shape and 
@@ -356,7 +377,7 @@ namespace Tetris
             if (minDistanceFromRightBorder > Block.BlockLength) return Block.BlockLength;
             else return minDistanceFromRightBorder;
 
-        }
+        } // end method ShortestDistanceFromRight
 
         /// <summary>
         /// This method returns the shortest distance between a block in the falling shape and 
@@ -376,7 +397,7 @@ namespace Tetris
             if (minDistanceFromBottom > Block.BlockLength) return Block.BlockLength;
             else return minDistanceFromBottom;
 
-        }
+        } // end method ShortestDistanceFromBottom
 
         /// <summary>
         /// This method rotates the current shape if it can rotate without going past
@@ -398,7 +419,7 @@ namespace Tetris
                 //currentShape.RotateShape();
             }
 
-        }
+        } // end method RotateCurrentShape
         #endregion
 
         #region Collision Detection Methods
@@ -438,7 +459,7 @@ namespace Tetris
             }
 
             return false;
-        }
+        } // end method IsTouchingPile
 
         /// <summary>
         /// This method checks to see if a temporary shape is past the left or right border.
@@ -451,7 +472,7 @@ namespace Tetris
                 if (block.Location.X < Boundaries.Left
                     || block.Area.Right > Boundaries.Right) return true;
             return false;
-        }
+        } // end method WouldPassLeftOrRightBorder
 
         /// <summary>
         /// This method checks to see if a temporary shape is touching the bottom of the grid.
@@ -463,7 +484,7 @@ namespace Tetris
             foreach (Block block in shapeToTest.ShapeBlocks)
                 if (block.Area.Bottom == Boundaries.Bottom) return true;
             return false;
-        }
+        } // end method IsTouchingBottom
 
         /// <summary>
         /// This method checks to see if a temporary shape is overlapping a block on the pile.
@@ -481,7 +502,7 @@ namespace Tetris
                 //if(gridBlock.Area.Contains(point)) return true;
             }
             return false;
-        }
+        } // end method WouldOverlapGridBlock
 
         /// <summary>
         /// This method checks to see if the pile of non-moving, uncleared blocks has reached the 
@@ -493,7 +514,7 @@ namespace Tetris
             foreach (Block block in gridPile.PileBlocks)
                 if (block.Location.Y <= Boundaries.Top) return true;
             return false;
-        }
+        } // end method PileReachedTheTop
 
         /// <summary>
         /// This method runs several checks to see if the current shape can move down any further.
@@ -502,7 +523,7 @@ namespace Tetris
         private bool ShapeCanMoveDown()
         {
             return (!IsTouchingPile(currentShape) && !IsTouchingBottom(currentShape));
-        }
+        } // end method ShapeCanMoveDown
 
         #endregion
 
@@ -548,7 +569,7 @@ namespace Tetris
                     foreach (Block block in blockList)
                         if (!block.IsFlashing()) block.StartFlashing();
             }
-        }
+        } // end method FlashLines
 
         /// <summary>
         /// This method removes lines of blocks from the pile.
@@ -578,20 +599,12 @@ namespace Tetris
                     foreach (Block block in blocksAbove)
                         block.Location = new Point(block.Location.X, block.Location.Y + Block.BlockLength);
 
-                    //for (int j = linesToClear[i].Count - 1; j >= 0; j--)
-                    //{
-                      //  gridPile.PileBlocks.Remove(linesToClear[i][j]);
-                    //}
-                    /*There's no particular reason to use the RemoveBlocksFromPile
-                     method over the for loop right above. I just had that method
-                     baked into the class and decided to use it in case 
-                     the protocol for removing lines change.*/
                     gridPile.RemoveBlocksFromPile(linesToClear[i]);
                     linesToClear.Remove(linesToClear[i]);
                 }
 
             }
-        }
+        } // end method ClearLines
 
         /// <summary>
         /// This adds the number of lines that were cleared to the Lines Cleared variable.
@@ -600,7 +613,7 @@ namespace Tetris
         private void AddToLinesCleared(int numberOfLines)
         {
             LinesCleared += numberOfLines;
-        }
+        } // end method AddToLinesCleared
 
         /// <summary>
         /// This adds the number of lines that were cleared to the Score variable.
@@ -630,7 +643,7 @@ namespace Tetris
                 default:
                     break;
             }
-        }
+        } // end method AddLinesToScore
 
         /// <summary>
         /// This method raises the level and speeds up the game if the player has cleared a certain number of lines.
@@ -643,7 +656,7 @@ namespace Tetris
                 framesToSkip--;
                 if (Level < 7) Level++;
             }
-        }
+        } // end method CheckToRaiseLevel
 
         #endregion
 
@@ -672,7 +685,7 @@ namespace Tetris
                     }
                 }
             }
-        }
+        } // end method CheckToAddShapeToPile
 
         /// <summary>
         /// This method will send a new shape moving down the grid.
@@ -684,7 +697,7 @@ namespace Tetris
                 currentShape = dropShapes[0];
                 dropShapes.Remove(currentShape);
             }
-        }
+        } // end method CheckToGenerateNewCurrentShape
 
         /// <summary>
         /// This method will check to see if a shape should be loaded to be sent out next.
@@ -698,7 +711,7 @@ namespace Tetris
                 Shape nextShape = new Shape(shapeGenerationPoint, BlockType, (ShapeName)randomShapeNumber);
                 dropShapes.Add(nextShape);
             }
-        }
+        } // end method CheckToInsertNextShape
 
         /// <summary>
         /// This method will hold a shape for later. If there's already a shape being held, it will swap out that shape
@@ -723,7 +736,7 @@ namespace Tetris
                     currentShape = null;
                 }
             }
-        }
+        } // end method HoldShape
         #endregion 
     }
 }

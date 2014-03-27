@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+ * The Shape class is the basis for all shapes (I, J, L, O, S, T, Z) seen within the game.  
+ * It needs a location, an integer (for rotated position), a BlockType, and a ShapeName to be created.
+ * However, it has alternate constructors.
+ * The class has public methods for moving, copying, and rotating the shape.
+ * The class has private methods for creating the shape depending on the ShapeName and BlockType.
+ * It delegates all shape creation to the ShapeConstructor class. Without that class, the shape
+ * wouldn't be formed.
+ * 
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,23 +21,6 @@ namespace Tetris
     public class Shape
     {
         
-        /*This shape class will be the basis for all shapes
-         (lists of blocks arranged into certain formations).
-         However, the main goal right now is to get a rotate 
-         algorithm working. The algorithm I found on youtube needs a pivot
-         square to work.
-         
-         The rotate algorithm works, but now I need to move it.
-         It needs to check for collision with another block, and
-         we don't have another block in this class.
-         * 
-         * Maybe I should split processing in case of the move and rotate.
-         * have the move/rotate return lists of points, and then have the grid
-         * check the lists. if they're good, the block can move and performs the rest of
-         * the move operation from within the class.
-         * 
-         */
-
         public List<Block> ShapeBlocks;
         //public Rectangle boundaries;
         public Block PivotBlock;
@@ -72,35 +67,11 @@ namespace Tetris
             ShapeBlocks.Add(block4);*/
             shapeConstructor = new ShapeConstructor(this);
             shapeConstructor.FormShape();
-            ConstructShape(rotationIndex);
-        }
+            ArrangeShape(rotationIndex);
+        } // end constructor method Shape
 
-        public Shape(Point location, BlockType blockType, ShapeName shapeName) : this(location, 0, blockType, shapeName){}
-
-
-        /*public Shape(Point location, Color color, BlockType blockType)
-        {
-            //this.boundaries = boundaries;
-            this.Location = location;
-            this.Color = color;
-            this.ShapeBlocks = new List<Block>();
-            this.blockType = blockType;
-            block1 = new Block(location, color, blockType);
-            block2 = new Block(location, color, blockType);
-            block3 = new Block(location, color, blockType);
-            block4 = new Block(location, color, blockType);
-            ShapeBlocks.Add(block1);
-            ShapeBlocks.Add(block2);
-            ShapeBlocks.Add(block3);
-            ShapeBlocks.Add(block4);
-        }*/
-
-        /// <summary>
-        /// Instantiates a solid block instance of the Shape class from a location point and a color.
-        /// </summary>
-        /// <param name="location">The location point where the shape is made.</param>
-        /// <param name="color">The color of the shape.</param>
-        //public Shape(Point location, Color color): this(location, color, BlockType.Solid) { }
+        public Shape(Point location, BlockType blockType, ShapeName shapeName)
+            : this(location, 0, blockType, shapeName) { }  // end constructor method Shape
 
         /// <summary>
         /// This method draws the Shape onto the screen.
@@ -109,47 +80,62 @@ namespace Tetris
         public void Draw(Graphics g) {
             foreach (Block block in ShapeBlocks)
                 block.Draw(g);
-        }
-
-        //protected abstract void ConstructShape(int shapeIndex);
+        } // end method Draw
 
         /// <summary>
-        /// This method copies the shape exactly 
+        /// This method copies a shape at the same position and location as the original.
         /// </summary>
-        /// <returns>A copy of the shape.</returns>
-        //public abstract Shape CopyShape();
-
-        //public abstract Shape CopyShape(Point location);
-
-        //public abstract Shape CopyShape(Point location, int rotationIndex);
-
+        /// <returns>A copied shape in the same position and location as the original.</returns>
         public Shape CopyShape(){
             return CopyShape(PivotBlock.Location, this.rotationIndex);
-        }
+        } // end method CopyShape
 
+        /// <summary>
+        /// This method copies a shape to another with a given location and the starting shape position.
+        /// </summary>
+        /// <param name="location">The location to place the copied shape.</param>
+        /// <returns>A copied shape at a given location and the original shape position.</returns>
         public Shape CopyShape(Point location){
             return CopyShape(location, 0);
-        }
+        } // end method CopyShape
 
+        /// <summary>
+        /// This method copies a shape to another with a given location and a given shape position.
+        /// </summary>
+        /// <param name="location">The location to place the copied shape.</param>
+        /// <param name="rotationIndex">The position the shape is supposed to have.</param>
+        /// <returns>A copied shape in the suggested location and position.</returns>
         public Shape CopyShape(Point location, int rotationIndex){
             //return new Shape(location, rotationIndex, blockType);
             return new Shape(location, rotationIndex, this.blockType, this.shapeName);
-        }
+        } // end method CopyShape
 
+        /// <summary>
+        /// This method rotates a shape 90 degrees CounterClockWise.
+        /// </summary>
         public virtual void RotateShape() {
+            /* Rotation is actually handled in the NewBlockLocationsExtensions
+             * class. The ConstructShape method automatically takes care of this
+             * as a result.
+             */
             rotationIndex = (rotationIndex + 1) % 4;
-            ConstructShape(rotationIndex);
-        }
+            ArrangeShape(rotationIndex);
+        } // end method RotateShape
 
-        protected virtual void ConstructShape(int shapeIndex)
+        /// <summary>
+        /// This method arranges the shape's blocks into a certain formation, depending on
+        /// the position number
+        /// </summary>
+        /// <param name="positionNumber">The position you want the shape to have.</param>
+        protected virtual void ArrangeShape(int positionNumber)
         {
             for (int i = 0; i < blocksToAssign.Length; i++)
             {
                 blocksToAssign[i].Location =
                     connections[i].RotatedCCWPoint(connections[i],
-                    blocksToGoFrom[i], shapeIndex);
+                    blocksToGoFrom[i], positionNumber);
             }
-        }
+        } // end method ConstructShape
 
         /// <summary>
         /// Moves the shape a certain distance in the direction specified.
@@ -176,7 +162,7 @@ namespace Tetris
                     break;
             } // end switch
 
-        }
+        } // end method Move
 
         /// <summary>
         /// Moves the shape one block in the direction specified.
@@ -185,7 +171,7 @@ namespace Tetris
         public void Move(Direction direction)
         {
             Move(direction, Block.BlockLength);
-        }
+        } // end method Move
 
         /// <summary>
         /// This method moves the entire shape down.
@@ -194,7 +180,7 @@ namespace Tetris
         public void MoveShapeDown(int distance){
             for (int i = 0; i < ShapeBlocks.Count; i++)
                 ShapeBlocks[i].Move(Direction.Down, distance);
-        }
+        } // end method MoveShapeDown
 
         /// <summary>
         /// This method moves the entire shape left.
@@ -204,7 +190,7 @@ namespace Tetris
         {
             for (int i = 0; i < ShapeBlocks.Count; i++)
                 ShapeBlocks[i].Move(Direction.Left, distance);
-        }
+        } // end method MoveShapeLeft
 
         /// <summary>
         /// This method moves the entire shape right.
@@ -214,7 +200,7 @@ namespace Tetris
         {
             for (int i = 0; i < ShapeBlocks.Count; i++)
                 ShapeBlocks[i].Move(Direction.Right, distance);
-        }
+        } // end method MoveShapeRight
 
         /// <summary>
         /// This method moves the entire shape up.
@@ -224,7 +210,7 @@ namespace Tetris
         {
             for (int i = 0; i < ShapeBlocks.Count; i++)
                 ShapeBlocks[i].Move(Direction.Up, distance);
-        }
+        } // end method MoveShapeUp
 
     }
 }

@@ -1,4 +1,15 @@
-﻿using System;
+﻿/*
+ * The TimedEffect class starts and keeps track of a time span, so that a class using it can do
+ * something over a certain period of time. When the time has expired, the effect stops. 
+ * It can be reset, then started again, if the user/client class wants to use one for the whole program.
+ * It needs a number (for time) and a TimeUnit enum (to represent the unit of time) for its creation.
+ * The TimedEffect has public methods for starting it, resetting it, and checking to see 
+ * if it's active or expired. 
+ *
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

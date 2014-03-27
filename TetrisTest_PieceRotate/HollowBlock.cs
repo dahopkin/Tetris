@@ -1,4 +1,22 @@
-﻿using System;
+﻿/*
+ * The HollowBlock class renders a block that is semi-transparent with a colored border. 
+ * It uses an IConstructStyle Interface using object (HollowBlockImages) for building 
+ * the block's images, and a IDrawStyle Interface using object (DrawFrom2ImageArray)
+ * for drawing them onto the screen.
+ * 
+ * It only needs a block for its constructor. 
+ * 
+ * The class has public methods for:
+ * -Drawing the block (delegated to the IDrawStyle)
+ * -Starting a block's flash animation and checking on the status of that animation
+ * (i.e. is it still going, or has it expired). This is
+ * also delegated to the IDrawStyle.
+ * -Constructing the block(delegated to the IConstructStyle)
+ * 
+ * (c) Copyright 2014 Daniel Hopkins. All Rights Reserved.
+ * E-mail: dahopkin2@gmail.com
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
